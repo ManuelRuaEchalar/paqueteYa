@@ -1,0 +1,61 @@
+<%- include('head') %>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <%- include('logo', { href: '/app' }) %>
+    <nav class="desk-nav">
+      <a href="/app" class="<%= path === '/app' || path.startsWith('/app/paquete') ? 'active' : '' %>">Paquetes</a>
+      <a href="/app/registrar" class="<%= path === '/app/registrar' ? 'active' : '' %>">Registrar</a>
+      <a href="/app/escanear" class="<%= path === '/app/escanear' ? 'active' : '' %>">Escanear</a>
+      <a href="/app/cajas" class="<%= path === '/app/cajas' ? 'active' : '' %>">Cajas</a>
+    </nav>
+    <div class="who">
+      <div class="who-meta">
+        <strong><%= user.paqueteria %></strong>
+        <span class="punto-pill">Punto #<%= user.id %></span>
+      </div>
+      <div class="menu" id="menu">
+        <button class="avatar" type="button" onclick="this.parentNode.classList.toggle('open')" aria-label="Menú de cuenta"><%= user.nombre.charAt(0).toUpperCase() %></button>
+        <div class="menu-pop">
+          <div class="item"><strong><%= user.nombre %></strong><br><small class="muted"><%= user.email %></small></div>
+          <form method="post" action="/logout"><button type="submit">Cerrar sesión</button></form>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="main">
+<% const maps = mapsUrl(user); %>
+<div class="addr-row">
+  <aside class="addr-panel" id="addr">
+    <div class="addr-view">
+      <div class="addr-head">
+        <span class="addr-ic"><%- icon('pin', 16) %></span>
+        <span class="addr-label">Dirección del punto</span>
+        <button type="button" class="addr-edit" onclick="addrToggle(true)"><%- icon('edit', 14) %> Editar</button>
+      </div>
+      <% if (user.direccion) { %>
+        <div class="addr-text"><%= user.direccion %></div>
+      <% } else { %>
+        <div class="addr-text muted">Aún no registraste la dirección.</div>
+      <% } %>
+      <div class="addr-foot">
+        <% if (maps) { %><a href="<%= maps %>" target="_blank" rel="noopener"><%- icon('external', 14) %> Ver en Google Maps</a><% } %>
+        <% if (user.lat != null) { %><span class="mono"><%= user.lat.toFixed(5) %>, <%= user.lng.toFixed(5) %></span><% } %>
+      </div>
+    </div>
+    <form class="addr-form" method="post" action="/app/direccion">
+      <input type="hidden" name="back" value="<%= url %>">
+      <input type="hidden" name="lat" value="<%= user.lat ?? '' %>">
+      <input type="hidden" name="lng" value="<%= user.lng ?? '' %>">
+      <label for="addr-dir">Dirección del punto</label>
+      <textarea class="input" id="addr-dir" name="direccion" rows="2" maxlength="300" placeholder="Ej: Calle Bolívar #123, entre Junín y Ayacucho, Sucre"><%= user.direccion || '' %></textarea>
+      <button type="button" class="btn btn-ghost btn-block addr-geo" onclick="addrLocate(this)"><%- icon('locate', 16) %> Tomar mi ubicación actual</button>
+      <div class="addr-status" id="addr-status"><% if (user.lat != null) { %>Ubicación guardada: <span class="mono"><%= user.lat.toFixed(5) %>, <%= user.lng.toFixed(5) %></span> · <a href="#" onclick="addrClear();return false">Quitar</a><% } else { %>Sin ubicación en el mapa.<% } %></div>
+      <div class="addr-btns">
+        <button type="button" class="btn btn-ghost" onclick="addrToggle(false)">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </aside>
+</div>

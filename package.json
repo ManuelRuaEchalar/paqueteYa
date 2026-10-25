@@ -1,0 +1,26 @@
+{
+  "name": "paqueteya",
+  "version": "1.0.0",
+  "description": "Gestión de paquetes para puntos de entrega",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "db:schema": "node --env-file-if-exists=.env scripts/db-schema.js",
+    "db:migrar": "node --env-file-if-exists=.env --no-warnings=ExperimentalWarning scripts/migrar-sqlite.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/functions": "^3.10.3",
+    "cookie-session": "^2.1.1",
+    "ejs": "^7.0.2",
+    "express": "^4.22.3",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

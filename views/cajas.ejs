@@ -1,0 +1,44 @@
+<%- include('partials/app-top', { title: 'Cajas' }) %>
+<div class="narrow">
+  <div class="page-head">
+    <h1>Cajas</h1>
+    <p>Las ubicaciones donde guardas los paquetes. Aparecen para elegir al registrar o recibir un paquete.</p>
+  </div>
+  <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+
+  <form class="card caja-add" method="post" action="/app/cajas" autocomplete="off">
+    <input class="input mono" name="nombre" placeholder="Nueva caja, ej: D-3" maxlength="20" required style="text-transform:uppercase">
+    <button class="btn btn-primary" type="submit"><%- icon('plus', 18) %> Agregar</button>
+  </form>
+
+  <% if (cajas.length === 0) { %>
+    <div class="empty" style="margin-top:16px">
+      <div class="ill"><%- icon('grid', 30) %></div>
+      <h3>Aún no hay cajas</h3>
+      <p>Agrega las cajas o estantes de tu punto (A-1, B-2, ESTANTE 3…).</p>
+    </div>
+  <% } else { %>
+    <div class="list" style="margin-top:16px">
+      <% for (const c of cajas) { %>
+        <div class="caja" id="caja-<%= c.id %>">
+          <div class="caja-view">
+            <span class="loc mono"><%= c.nombre %></span>
+            <span class="muted caja-n"><%= c.activos %> paquete<%= c.activos === 1 ? '' : 's' %> sin entregar</span>
+            <button class="btn btn-ghost btn-sm" type="button" onclick="this.closest('.caja').classList.add('editing');this.closest('.caja').querySelector('input[name=nombre]').select()" aria-label="Editar <%= c.nombre %>"><%- icon('edit', 16) %></button>
+            <form method="post" action="/app/cajas/<%= c.id %>" onsubmit="return confirm('¿Eliminar la caja <%= c.nombre %>?<%= c.activos ? ` Tiene ${c.activos} paquete(s) sin entregar; conservarán el nombre en su ficha.` : '' %>')">
+              <input type="hidden" name="accion" value="eliminar">
+              <button class="btn btn-danger btn-sm" type="submit" aria-label="Eliminar <%= c.nombre %>"><%- icon('trash', 16) %></button>
+            </form>
+          </div>
+          <form class="caja-form" method="post" action="/app/cajas/<%= c.id %>" autocomplete="off">
+            <input class="input mono" name="nombre" value="<%= c.nombre %>" maxlength="20" required style="text-transform:uppercase">
+            <button class="btn btn-ghost" type="button" onclick="this.closest('.caja').classList.remove('editing')">Cancelar</button>
+            <button class="btn btn-primary" type="submit">Guardar</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+    <p class="hint" style="margin-top:12px">Al renombrar una caja, los paquetes que estaban en ella se actualizan con el nuevo nombre.</p>
+  <% } %>
+</div>
+<%- include('partials/app-bottom') %>

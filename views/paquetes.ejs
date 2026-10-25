@@ -1,0 +1,62 @@
+<%- include('partials/app-top', { title: 'Paquetes' }) %>
+<div class="page-head">
+  <h1>Hola, <%= user.nombre.split(' ')[0] %></h1>
+  <p>Así va tu punto hoy.</p>
+</div>
+
+<% if (bienvenida) { %>
+  <div class="alert alert-ok">¡Bienvenido a <span data-brand-txt>PaqueteYa</span>! Tu número de punto es <strong>#<%= user.id %></strong>. Registra tu primer paquete con el botón <strong>Registrar</strong>.</div>
+<% } %>
+
+<div class="stats">
+  <% for (const [k, label] of Object.entries(ESTADOS)) { %>
+    <a href="/app?estado=<%= k %>" class="stat st-<%= k %> <%= estado === k ? 'active' : '' %>">
+      <span class="n"><%= counts[k] %></span>
+      <span class="l"><span class="dot" style="background:var(--c)"></span><%= label %></span>
+    </a>
+  <% } %>
+</div>
+
+<form class="search" method="get" action="/app">
+  <input type="hidden" name="estado" value="<%= estado %>">
+  <input class="input" type="search" name="q" value="<%= q %>" placeholder="Código, nombre, teléfono o CI">
+  <a href="/app/escanear" class="btn btn-primary" aria-label="Escanear QR"><%- icon('scan') %></a>
+</form>
+
+<% if (paquetes.length === 0) { %>
+  <div class="empty">
+    <div class="ill"><%- icon('inbox', 30) %></div>
+    <% if (q) { %>
+      <h3>Sin resultados</h3>
+      <p>No hay paquetes "<%= ESTADOS[estado].toLowerCase() %>" que coincidan con "<%= q %>".</p>
+      <a class="btn btn-ghost" href="/app?estado=<%= estado %>">Limpiar búsqueda</a>
+    <% } else if (estado === 'por_recibir') { %>
+      <h3>Nada pendiente por recibir</h3>
+      <p>Cuando registres un paquete aparecerá aquí hasta que llegue a tu punto.</p>
+      <a class="btn btn-primary" href="/app/registrar"><%- icon('plus', 18) %> Registrar paquete</a>
+    <% } else if (estado === 'en_punto') { %>
+      <h3>Ningún paquete en el punto</h3>
+      <p>Los paquetes recibidos aparecerán aquí mientras esperan ser recogidos.</p>
+    <% } else { %>
+      <h3>Aún no hay entregas</h3>
+      <p>Los paquetes entregados al destinatario quedarán guardados aquí.</p>
+    <% } %>
+  </div>
+<% } else { %>
+  <div class="list">
+    <% for (const p of paquetes) { %>
+      <a class="pkg st-<%= p.estado %>" href="/app/paquete/<%= p.codigo %>">
+        <div class="pkg-box"><% if (p.ubicacion) { %><%= p.ubicacion %><% } else { %><%- icon('box') %><% } %></div>
+        <div class="pkg-body">
+          <div class="top">
+            <span class="pkg-code mono"><%= p.codigo %></span>
+            <span class="pkg-time"><%= fmtFecha(p.entregado_at || p.recibido_at || p.created_at) %></span>
+          </div>
+          <div class="pkg-name"><%= p.destinatario_nombre %></div>
+          <div class="pkg-sub">De <%= p.remitente_nombre %><%= p.descripcion ? ' · ' + p.descripcion : '' %></div>
+        </div>
+      </a>
+    <% } %>
+  </div>
+<% } %>
+<%- include('partials/app-bottom') %>

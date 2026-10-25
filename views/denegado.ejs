@@ -1,0 +1,12 @@
+<%- include('partials/head', { title: 'Sin acceso' }) %>
+<body>
+<div style="min-height:100vh;display:grid;place-items:center;padding:16px">
+  <div class="empty" style="max-width:420px;border-style:solid">
+    <div class="ill"><%- icon('lock', 30) %></div>
+    <h3>No encontramos este paquete</h3>
+    <p>No existe o pertenece a otro punto. Sólo el punto que registró el paquete puede ver su información.</p>
+    <a class="btn btn-primary" href="<%= user ? '/app' : '/' %>">Volver</a>
+  </div>
+</div>
+</body>
+</html>

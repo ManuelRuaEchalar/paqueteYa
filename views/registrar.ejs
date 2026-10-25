@@ -1,0 +1,72 @@
+<%- include('partials/app-top', { title: 'Registrar' }) %>
+<div class="narrow">
+  <div class="page-head">
+    <h1>Registrar paquete</h1>
+    <p>Se generará un código y un QR único para este paquete.</p>
+  </div>
+  <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <form class="card" method="post" action="/app/registrar" autocomplete="off">
+    <div class="section-title"><span class="num">1</span> Remitente</div>
+    <div class="form-grid two">
+      <div class="field">
+        <label for="rn">Nombre del remitente</label>
+        <input class="input" id="rn" name="remitente_nombre" placeholder="Ej: María Pérez" value="<%= form.remitente_nombre || '' %>" required>
+      </div>
+      <div class="field">
+        <label for="rw">WhatsApp del remitente</label>
+        <div class="input-group"><span class="prefix">+591</span>
+          <input class="input" id="rw" name="remitente_whatsapp" inputmode="tel" placeholder="71234567" value="<%= form.remitente_whatsapp || '' %>" required></div>
+        <div class="hint">Le enviarás el código por aquí para que lo reenvíe al destinatario.</div>
+      </div>
+      <div class="field">
+        <label for="rc">CI del remitente <small>(opcional)</small></label>
+        <input class="input mono" id="rc" name="remitente_ci" placeholder="Ej: 1234567 CH" maxlength="20" value="<%= form.remitente_ci || '' %>" style="text-transform:uppercase">
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="section-title"><span class="num">2</span> Destinatario</div>
+    <div class="form-grid two">
+      <div class="field">
+        <label for="dn">Nombre del destinatario</label>
+        <input class="input" id="dn" name="destinatario_nombre" placeholder="Ej: Ana García" value="<%= form.destinatario_nombre || '' %>" required>
+      </div>
+      <div class="field">
+        <label for="dw">WhatsApp del destinatario</label>
+        <div class="input-group"><span class="prefix">+591</span>
+          <input class="input" id="dw" name="destinatario_whatsapp" inputmode="tel" placeholder="71234567" value="<%= form.destinatario_whatsapp || '' %>" required></div>
+      </div>
+      <div class="field">
+        <label for="dc">CI del destinatario <small>(opcional)</small></label>
+        <input class="input mono" id="dc" name="destinatario_ci" placeholder="Ej: 1234567 CH" maxlength="20" value="<%= form.destinatario_ci || '' %>" style="text-transform:uppercase">
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="section-title"><span class="num">3</span> Paquete</div>
+    <div class="field">
+      <label for="de">Descripción <small>(opcional)</small></label>
+      <input class="input" id="de" name="descripcion" placeholder="Ej: Vestido floral talla M" value="<%= form.descripcion || '' %>">
+    </div>
+    <div class="form-grid two">
+      <div class="field">
+        <label for="pr">Precio <small>(opcional)</small></label>
+        <div class="price-row">
+          <select class="input" name="moneda" aria-label="Moneda">
+            <option value="Bs." <%= form.moneda !== 'USD' ? 'selected' : '' %>>Bs.</option>
+            <option value="USD" <%= form.moneda === 'USD' ? 'selected' : '' %>>USD</option>
+          </select>
+          <input class="input" id="pr" name="precio" type="number" min="0" step="0.01" inputmode="decimal" placeholder="150" value="<%= form.precio || '' %>">
+        </div>
+      </div>
+      <div class="field">
+        <label for="ub">Ubicación en caja <small>(opcional)</small></label>
+        <select class="input mono" id="ub" name="ubicacion">
+          <option value="">Sin asignar</option>
+          <% for (const c of cajas) { %><option value="<%= c.nombre %>" <%= form.ubicacion === c.nombre ? 'selected' : '' %>><%= c.nombre %></option><% } %>
+        </select>
+        <div class="hint"><% if (cajas.length) { %><a href="/app/cajas">Gestionar cajas</a><% } else { %>Aún no tienes cajas. <a href="/app/cajas">Crea tus cajas aquí</a>.<% } %></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block btn-lg" type="submit">Registrar paquete</button>
+  </form>
+</div>
+<%- include('partials/app-bottom') %>

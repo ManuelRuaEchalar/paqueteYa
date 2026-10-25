@@ -1,0 +1,75 @@
+<%- include('partials/app-top', { title: 'Escanear' }) %>
+<div class="narrow" style="max-width:520px">
+  <div class="page-head">
+    <h1>Escanear paquete</h1>
+    <p>Apunta al QR de la etiqueta o elige una foto de tu galería.</p>
+  </div>
+
+  <div class="scan-tabs">
+    <button class="btn btn-primary" id="btnCam" type="button"><%- icon('camera', 18) %> Cámara</button>
+    <label class="btn btn-ghost" for="file"><%- icon('image', 18) %> Galería</label>
+    <input type="file" id="file" accept="image/*" hidden>
+  </div>
+
+  <div id="reader"></div>
+  <div class="alert alert-error" id="err" style="display:none;margin-top:12px"></div>
+  <p class="scan-hint" id="hint">Toca <strong>Cámara</strong> para empezar.</p>
+
+  <form class="card" method="get" onsubmit="event.preventDefault(); go(this.code.value)" style="margin-top:8px">
+    <label class="muted" style="font-size:.85rem;font-weight:600">¿No lee el QR? Escribe el código</label>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input class="input mono" name="code" placeholder="P<%= user.id %>-00001" style="text-transform:uppercase">
+      <button class="btn btn-dark" type="submit">Buscar</button>
+    </div>
+  </form>
+</div>
+<div id="tmp" style="display:none"></div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  const err = document.getElementById('err');
+  const hint = document.getElementById('hint');
+  const showErr = (m) => { err.textContent = m; err.style.display = 'block'; };
+
+  function go(text) {
+    text = String(text || '').trim();
+    if (!text) return;
+    // El QR contiene una URL /q/<token>; también se acepta un código escrito a mano.
+    try {
+      const u = new URL(text);
+      if (u.pathname.startsWith('/q/')) return location.href = u.pathname;
+    } catch (_) {}
+    if (/^P\d+-\d+$/i.test(text)) return location.href = '/app/paquete/' + text.toUpperCase();
+    showErr('Este QR no corresponde a un paquete de este sistema.');
+  }
+
+  let cam;
+  document.getElementById('btnCam').onclick = async () => {
+    err.style.display = 'none';
+    if (cam && cam.isScanning) { await cam.stop(); hint.textContent = 'Cámara detenida.'; return; }
+    cam = cam || new Html5Qrcode('reader');
+    try {
+      await cam.start({ facingMode: 'environment' }, { fps: 10, qrbox: 240 }, async (text) => {
+        await cam.stop(); go(text);
+      });
+      hint.textContent = 'Buscando un código QR…';
+    } catch (e) {
+      showErr('No se pudo abrir la cámara. Revisa los permisos o usa la opción Galería.');
+    }
+  };
+
+  document.getElementById('file').onchange = async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    err.style.display = 'none';
+    if (cam && cam.isScanning) await cam.stop();
+    try {
+      const text = await new Html5Qrcode('tmp').scanFile(f, false);
+      go(text);
+    } catch (_) {
+      showErr('No encontramos un QR en esa imagen. Prueba con una foto más nítida.');
+    }
+    e.target.value = '';
+  };
+</script>
+<%- include('partials/app-bottom') %>

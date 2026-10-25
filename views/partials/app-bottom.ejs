@@ -1,0 +1,43 @@
+</main>
+<nav class="bottom-nav">
+  <a href="/app" class="<%= path === '/app' || path.startsWith('/app/paquete') ? 'active' : '' %>"><span class="ic"><%- icon('box') %></span>Paquetes</a>
+  <a href="/app/registrar" class="cta <%= path === '/app/registrar' ? 'active' : '' %>"><span class="ic"><%- icon('plus') %></span>Registrar</a>
+  <a href="/app/escanear" class="<%= path === '/app/escanear' ? 'active' : '' %>"><span class="ic"><%- icon('scan') %></span>Escanear</a>
+  <a href="/app/cajas" class="<%= path === '/app/cajas' ? 'active' : '' %>"><span class="ic"><%- icon('grid') %></span>Cajas</a>
+</nav>
+<script>
+  document.addEventListener('click', (e) => {
+    const m = document.getElementById('menu');
+    if (m && !m.contains(e.target)) m.classList.remove('open');
+  });
+
+  // Panel de dirección del punto
+  const addr = document.getElementById('addr');
+  function addrToggle(on) {
+    addr.classList.toggle('editing', on);
+    if (on) addr.querySelector('textarea').focus();
+  }
+  function addrStatus(html) { document.getElementById('addr-status').innerHTML = html; }
+  function addrClear() {
+    addr.querySelector('[name=lat]').value = '';
+    addr.querySelector('[name=lng]').value = '';
+    addrStatus('Sin ubicación en el mapa.');
+  }
+  function addrLocate(btn) {
+    if (!navigator.geolocation) return addrStatus('Este navegador no permite obtener la ubicación.');
+    btn.disabled = true;
+    addrStatus('Obteniendo ubicación…');
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const lat = pos.coords.latitude.toFixed(6), lng = pos.coords.longitude.toFixed(6);
+      addr.querySelector('[name=lat]').value = lat;
+      addr.querySelector('[name=lng]').value = lng;
+      addrStatus(`Ubicación tomada: <span class="mono">${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}</span> (±${Math.round(pos.coords.accuracy)} m) · <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" rel="noopener">revisar</a>. Pulsa Guardar.`);
+      btn.disabled = false;
+    }, (e) => {
+      addrStatus(e.code === 1 ? 'Permiso de ubicación denegado. Actívalo en el navegador.' : 'No se pudo obtener la ubicación. Intenta de nuevo.');
+      btn.disabled = false;
+    }, { enableHighAccuracy: true, timeout: 15000 });
+  }
+</script>
+</body>
+</html>

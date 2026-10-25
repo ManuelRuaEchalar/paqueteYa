@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etiqueta <%= p.codigo %></title>
+<style>
+  @page { size: 80mm auto; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #eee; font-family: Arial, Helvetica, sans-serif; color: #000; }
+  .bar { display: flex; gap: 8px; justify-content: center; padding: 12px; font-family: system-ui, sans-serif; }
+  .bar button, .bar select { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+  .bar button.p { background: #f97316; color: #fff; border: 0; font-weight: 700; }
+  .t { width: 80mm; margin: 0 auto 24px; background: #fff; padding: 5mm 4mm; font-size: 11px; text-transform: uppercase; }
+  .t.w58 { width: 58mm; font-size: 9.5px; }
+  .hd { text-align: center; }
+  .hd .n { font-size: 1.6em; font-weight: 800; letter-spacing: .02em; }
+  .hd div { line-height: 1.4; }
+  .sep { border: 0; border-top: 1.5px dashed #000; margin: 3mm 0; }
+  .row { display: flex; justify-content: space-between; gap: 2mm; }
+  .loc-l { font-size: .9em; }
+  .loc { font-size: 2.6em; font-weight: 800; line-height: 1.1; }
+  .qr { width: 28mm; height: 28mm; image-rendering: pixelated; }
+  .w58 .qr { width: 22mm; height: 22mm; }
+  .code-l { text-align: center; margin-top: 2mm; }
+  .code { text-align: center; font-size: 2.5em; font-weight: 800; letter-spacing: .02em; font-family: 'Courier New', monospace; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: .4mm 2mm; }
+  .kv b { text-align: right; font-weight: 700; overflow-wrap: anywhere; }
+  .c { text-align: center; }
+  .hd .addr { margin-top: 1mm; text-transform: none; }
+  .small { font-size: .85em; text-transform: none; }
+  @media print {
+    body { background: #fff; }
+    .bar { display: none; }
+    .t { margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <select onchange="document.querySelector('.t').classList.toggle('w58', this.value==='58');document.getElementById('pg').textContent='@page{size:'+this.value+'mm auto;margin:0}'">
+    <option value="80">Papel 80 mm</option>
+    <option value="58">Papel 58 mm</option>
+  </select>
+  <button class="p" onclick="window.print()">Imprimir</button>
+  <button onclick="window.close()">Cerrar</button>
+</div>
+<style id="pg"></style>
+
+<div class="t">
+  <div class="hd">
+    <div class="n"><%= user.paqueteria %></div>
+    <div>Punto #<%= user.id %></div>
+    <div>WhatsApp: <%= user.whatsapp %></div>
+    <% if (user.direccion) { %><div class="addr"><%= user.direccion %></div><% } %>
+    <% if (user.lat != null) { %><div class="small">Ubicación: <%= user.lat.toFixed(5) %>, <%= user.lng.toFixed(5) %></div><% } %>
+  </div>
+  <hr class="sep">
+  <div class="row">
+    <div>
+      <div class="loc-l">Ubicación en caja</div>
+      <div class="loc"><%= p.ubicacion || '—' %></div>
+      <% if (p.descripcion) { %><div class="small" style="margin-top:2mm"><%= p.descripcion %></div><% } %>
+    </div>
+    <img class="qr" src="<%= qr %>" alt="">
+  </div>
+  <hr class="sep">
+  <div class="row">
+    <div>Fecha y hora<br>registro</div>
+    <div style="text-align:right"><%= fmtFecha(p.created_at) %><br>Punto <%= user.id %></div>
+  </div>
+  <div class="code-l">Código / Guía</div>
+  <div class="code"><%= p.codigo %></div>
+  <hr class="sep">
+  <div class="kv">
+    <span>Remitente</span><b><%= p.remitente_nombre %></b>
+    <span>Tel. remitente</span><b><%= p.remitente_whatsapp.replace(/^591/, '') %></b>
+    <% if (p.remitente_ci) { %><span>CI remitente</span><b><%= p.remitente_ci %></b><% } %>
+    <span>Destinatario</span><b><%= p.destinatario_nombre %></b>
+    <span>Tel. destinatario</span><b><%= p.destinatario_whatsapp.replace(/^591/, '') %></b>
+    <% if (p.destinatario_ci) { %><span>CI destinatario</span><b><%= p.destinatario_ci %></b><% } %>
+    <% if (p.precio != null) { %><span>Precio</span><b><%= p.moneda %> <%= p.precio %></b><% } %>
+  </div>
+  <hr class="sep">
+  <div class="c"><b>Responsabilidad</b></div>
+  <div class="c small">El contenido del paquete es responsabilidad exclusiva del remitente.</div>
+  <div class="c small" style="margin-top:2mm"><b>Gracias por confiar en nosotros</b></div>
+</div>
+<script>if (location.hash === '#print') window.addEventListener('load', () => window.print());</script>
+</body>
+</html>

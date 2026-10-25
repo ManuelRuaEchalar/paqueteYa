@@ -1,0 +1,29 @@
+<%- include('partials/head', { title: 'Ingresar' }) %>
+<body>
+<div class="auth">
+  <aside class="auth-side">
+    <%- include('partials/logo') %>
+    <h2>Tu punto de entrega, <em>ordenado</em> y sin cuadernos.</h2>
+    <span style="position:relative;z-index:1;opacity:.6">© <span data-brand-txt>PaqueteYa</span></span>
+  </aside>
+  <main class="auth-main">
+    <div class="auth-box">
+      <div class="hide-desk"><%- include('partials/logo') %></div>
+      <h1>Bienvenido de vuelta</h1>
+      <p>Ingresa con el correo de tu paquetería.</p>
+      <% if (next && next.startsWith('/q/')) { %><div class="alert alert-ok">Inicia sesión para ver el paquete escaneado.</div><% } %>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <form method="post" action="/login">
+        <input type="hidden" name="next" value="<%= next %>">
+        <div class="field"><label for="em">Gmail</label>
+          <input class="input" id="em" type="email" name="email" value="<%= email %>" placeholder="tupaqueteria@gmail.com" required autofocus></div>
+        <div class="field"><label for="pw">Contraseña</label>
+          <input class="input" id="pw" type="password" name="password" required></div>
+        <button class="btn btn-primary btn-block btn-lg" type="submit">Ingresar</button>
+      </form>
+      <div class="auth-foot">¿Aún no tienes cuenta? <a href="/registro">Registra tu paquetería</a></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

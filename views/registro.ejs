@@ -1,0 +1,35 @@
+<%- include('partials/head', { title: 'Registro' }) %>
+<body>
+<div class="auth">
+  <aside class="auth-side">
+    <%- include('partials/logo') %>
+    <h2>Regístrate y recibe tu <em>número de punto</em> en segundos.</h2>
+    <span style="position:relative;z-index:1;opacity:.6">© <span data-brand-txt>PaqueteYa</span></span>
+  </aside>
+  <main class="auth-main">
+    <div class="auth-box">
+      <div class="hide-desk"><%- include('partials/logo') %></div>
+      <h1>Crea tu cuenta</h1>
+      <p>Al registrarte se te asigna un número de punto (#1, #2, …).</p>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <form method="post" action="/registro">
+        <div class="field"><label for="no">Tu nombre</label>
+          <input class="input" id="no" name="nombre" value="<%= form.nombre || '' %>" placeholder="Ej: Luis Rojas" required></div>
+        <div class="field"><label for="pa">Nombre de la paquetería</label>
+          <input class="input" id="pa" name="paqueteria" value="<%= form.paqueteria || '' %>" placeholder="Ej: Bodega Express" required></div>
+        <div class="field"><label for="em">Gmail</label>
+          <input class="input" id="em" type="email" name="email" value="<%= form.email || '' %>" placeholder="tupaqueteria@gmail.com" pattern=".+@gmail\.com" title="Debe ser un correo @gmail.com" required></div>
+        <div class="field"><label for="wa">WhatsApp</label>
+          <div class="input-group"><span class="prefix">+591</span>
+            <input class="input" id="wa" name="whatsapp" inputmode="tel" value="<%= form.whatsapp || '' %>" placeholder="71234567" required></div></div>
+        <div class="field"><label for="pw">Contraseña</label>
+          <input class="input" id="pw" type="password" name="password" minlength="6" required>
+          <div class="hint">Mínimo 6 caracteres.</div></div>
+        <button class="btn btn-primary btn-block btn-lg" type="submit">Crear cuenta</button>
+      </form>
+      <div class="auth-foot">¿Ya tienes cuenta? <a href="/login">Ingresa</a></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

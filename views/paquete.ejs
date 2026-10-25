@@ -1,0 +1,87 @@
+<%- include('partials/app-top', { title: p.codigo }) %>
+<%
+  const maps = mapsUrl(user);
+  const dondeTxt = (user.direccion ? `\nDirección: ${user.direccion}` : '') + (maps ? `\nUbicación: ${maps}` : '');
+  const msgRem = `Hola ${p.remitente_nombre}, el paquete para ${p.destinatario_nombre} quedó registrado en ${user.paqueteria} (Punto #${user.id}).\nCódigo: ${p.codigo}${dondeTxt}`;
+  const msgDest = `Hola ${p.destinatario_nombre}, tu paquete de ${p.remitente_nombre} ya está en ${user.paqueteria} (Punto #${user.id}). Preséntate con el código ${p.codigo} para recogerlo.${dondeTxt}`;
+%>
+<a href="/app?estado=<%= p.estado %>" class="muted" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none;margin-bottom:12px;font-weight:600"><%- icon('back', 18) %> Paquetes</a>
+
+<% if (nuevo) { %>
+  <div class="alert alert-ok"><strong>Paquete registrado.</strong> Imprime la etiqueta y avisa al remitente por WhatsApp.</div>
+<% } %>
+
+<div class="detail">
+  <div class="card">
+    <div class="detail-head">
+      <div>
+        <div class="muted" style="font-size:.8rem;font-weight:600">CÓDIGO / GUÍA</div>
+        <div class="detail-code mono"><%= p.codigo %></div>
+      </div>
+      <span class="badge st-<%= p.estado %>"><%= ESTADOS[p.estado] %></span>
+    </div>
+
+    <div class="kv">
+      <div><span>Remitente</span><strong><%= p.remitente_nombre %></strong>
+        <a href="https://wa.me/<%= p.remitente_whatsapp %>" target="_blank" rel="noopener">+<%= p.remitente_whatsapp %></a>
+        <% if (p.remitente_ci) { %><small class="muted ci">CI <%= p.remitente_ci %></small><% } %></div>
+      <div><span>Destinatario</span><strong><%= p.destinatario_nombre %></strong>
+        <a href="https://wa.me/<%= p.destinatario_whatsapp %>" target="_blank" rel="noopener">+<%= p.destinatario_whatsapp %></a>
+        <% if (p.destinatario_ci) { %><small class="muted ci">CI <%= p.destinatario_ci %></small><% } %></div>
+      <div><span>Descripción</span><strong><%= p.descripcion || '—' %></strong></div>
+      <div><span>Precio</span><strong><%= p.precio != null ? `${p.moneda} ${p.precio}` : '—' %></strong></div>
+      <div><span>Ubicación</span><% if (p.ubicacion) { %><span class="loc mono" style="margin-top:4px"><%= p.ubicacion %></span><% } else { %><strong>—</strong><% } %></div>
+      <div class="kv-wide"><span>Dirección del punto</span>
+        <% if (user.direccion || maps) { %>
+          <strong><%= user.direccion || 'Ubicación en el mapa' %></strong>
+          <% if (maps) { %><a href="<%= maps %>" target="_blank" rel="noopener"><%- icon('pin', 14) %> Ver en Google Maps</a><% } %>
+        <% } else { %><strong class="muted">Sin dirección. Regístrala en el panel de arriba.</strong><% } %>
+      </div>
+      <div><span>Historial</span>
+        <ul class="timeline">
+          <li class="done"><span class="d"></span><div>Registrado<br><small class="muted"><%= fmtFecha(p.created_at) %></small></div></li>
+          <li class="<%= p.recibido_at ? 'done' : '' %>"><span class="d"></span><div>En el punto<br><small class="muted"><%= fmtFecha(p.recibido_at) %></small></div></li>
+          <li class="<%= p.entregado_at ? 'done' : '' %>"><span class="d"></span><div>Entregado<br><small class="muted"><%= fmtFecha(p.entregado_at) %></small></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="actions">
+      <% if (p.estado === 'por_recibir') { %>
+        <form method="post" action="/app/paquete/<%= p.codigo %>/estado" style="display:flex;gap:8px">
+          <input type="hidden" name="accion" value="recibir">
+          <select class="input mono" name="ubicacion" aria-label="Caja" style="flex:1">
+            <option value="">Caja: sin asignar</option>
+            <% for (const c of cajas) { %><option value="<%= c.nombre %>" <%= p.ubicacion === c.nombre ? 'selected' : '' %>>Caja <%= c.nombre %></option><% } %>
+          </select>
+          <button class="btn btn-primary" type="submit"><%- icon('check', 18) %> Recibido</button>
+        </form>
+      <% } else if (p.estado === 'en_punto') { %>
+        <form method="post" action="/app/paquete/<%= p.codigo %>/estado">
+          <input type="hidden" name="accion" value="entregar">
+          <button class="btn btn-teal btn-block btn-lg" type="submit"><%- icon('check', 18) %> Entregar al destinatario</button>
+        </form>
+        <a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/<%= p.destinatario_whatsapp %>?text=<%= encodeURIComponent(msgDest) %>"><%- icon('wa', 18) %> Avisar al destinatario</a>
+      <% } %>
+      <a class="btn btn-ghost" target="_blank" rel="noopener" href="https://wa.me/<%= p.remitente_whatsapp %>?text=<%= encodeURIComponent(msgRem) %>"><%- icon('wa', 18) %> Enviar código al remitente</a>
+      <% if (p.estado !== 'por_recibir') { %>
+        <form method="post" action="/app/paquete/<%= p.codigo %>/estado">
+          <input type="hidden" name="accion" value="revertir">
+          <button class="btn btn-ghost btn-block" type="submit" style="font-weight:600;color:var(--muted)"><%- icon('undo', 16) %> Volver a "<%= p.estado === 'entregado' ? 'En el punto' : 'Por recibir' %>"</button>
+        </form>
+      <% } else { %>
+        <form method="post" action="/app/paquete/<%= p.codigo %>/estado" onsubmit="return confirm('¿Eliminar este paquete?')">
+          <input type="hidden" name="accion" value="eliminar">
+          <button class="btn btn-danger btn-block" type="submit"><%- icon('trash', 16) %> Eliminar</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card qr-card">
+    <img src="<%= qr %>" alt="QR del paquete <%= p.codigo %>">
+    <p class="muted" style="font-size:.85rem;margin:8px 0 16px">Sólo se abre con sesión iniciada en el Punto #<%= user.id %>.</p>
+    <a class="btn btn-dark btn-block btn-lg" href="/app/paquete/<%= p.codigo %>/ticket" target="_blank"><%- icon('printer', 18) %> Imprimir etiqueta</a>
+  </div>
+</div>
+<%- include('partials/app-bottom') %>

@@ -1,0 +1,113 @@
+<%- include('partials/head', { title: 'Gestión de paquetes para tu punto' }) %>
+<body style="background:#fff">
+<header class="l-nav">
+  <%- include('partials/logo') %>
+  <div class="links">
+    <a class="txt" href="#funciones">Funciones</a>
+    <a class="txt" href="#como">Cómo funciona</a>
+    <% if (user) { %>
+      <a class="btn btn-primary" href="/app">Ir a mi panel</a>
+    <% } else { %>
+      <a class="btn btn-ghost" href="/login">Ingresar</a>
+      <a class="btn btn-primary" href="/registro">Registrarme</a>
+    <% } %>
+  </div>
+</header>
+
+<section class="hero">
+  <div>
+    <span class="eyebrow"><%- icon('box', 16) %> Para paqueterías y puntos de entrega</span>
+    <h1>Cada paquete, <em>en su lugar</em> y con su QR.</h1>
+    <p class="lead">Registra los paquetes que llegan a tu punto, imprime una etiqueta con QR, avisa por WhatsApp y entrega en segundos. Sin cuadernos, sin confusiones.</p>
+    <div class="ctas">
+      <a class="btn btn-primary btn-lg" href="/registro">Registrar mi paquetería</a>
+      <a class="btn btn-ghost btn-lg" href="#como">Ver cómo funciona</a>
+    </div>
+    <div class="trust">
+      <span><%- icon('check', 16) %> Gratis para empezar</span>
+      <span><%- icon('check', 16) %> Funciona en el celular</span>
+      <span><%- icon('check', 16) %> Impresora térmica 58/80 mm</span>
+    </div>
+  </div>
+  <div class="mock" aria-hidden="true">
+    <div class="mock-phone">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <strong style="font-size:.9rem">Hola, Luis</strong><span class="punto-pill">Punto #1</span>
+      </div>
+      <div class="stats">
+        <div class="stat st-por_recibir"><span class="n">4</span><span class="l">Por recibir</span></div>
+        <div class="stat st-en_punto active"><span class="n">12</span><span class="l">En el punto</span></div>
+        <div class="stat st-entregado"><span class="n">87</span><span class="l">Entregados</span></div>
+      </div>
+      <div class="list" style="gap:8px">
+        <div class="pkg st-en_punto"><div class="pkg-box mono">D-3</div><div class="pkg-body"><span class="pkg-code mono">P1-00633</span><div class="pkg-name">Daniela B.</div><div class="pkg-sub">De H-Fit Sport</div></div></div>
+        <div class="pkg st-en_punto"><div class="pkg-box mono">A-1</div><div class="pkg-body"><span class="pkg-code mono">P1-00632</span><div class="pkg-name">Ana García</div><div class="pkg-sub">De María Pérez</div></div></div>
+        <div class="pkg st-en_punto"><div class="pkg-box mono">B-7</div><div class="pkg-body"><span class="pkg-code mono">P1-00631</span><div class="pkg-name">Carlos M.</div><div class="pkg-sub">De Tienda Luna</div></div></div>
+      </div>
+    </div>
+    <div class="mock-ticket">
+      <div>Ubicación</div><div class="big">D-3</div>
+      <div style="width:56px;height:56px;margin:4px auto;background:repeating-conic-gradient(#000 0 25%,#fff 0 50%) 0 0/14px 14px"></div>
+      <div>Código / Guía</div><div class="big">P1-00633</div>
+    </div>
+  </div>
+</section>
+
+<section class="l-section" id="funciones" style="background:var(--bg);max-width:none">
+  <div style="max-width:1120px;margin:0 auto">
+    <div class="head">
+      <span class="eyebrow">Funciones</span>
+      <h2>Todo lo que tu punto necesita, nada que sobre</h2>
+      <p>Pensado para el mostrador: rápido, claro y desde cualquier celular.</p>
+    </div>
+    <div class="features">
+      <div class="feature"><div class="ic"><%- icon('plus') %></div><h3>Registro en segundos</h3><p>Remitente, destinatario, descripción y precio. Se genera un código único como P1-00001.</p></div>
+      <div class="feature"><div class="ic"><%- icon('qr') %></div><h3>QR por paquete</h3><p>Cada paquete tiene su QR. Al escanearlo abre su ficha, pero sólo si tu punto inició sesión.</p></div>
+      <div class="feature"><div class="ic"><%- icon('printer') %></div><h3>Etiqueta imprimible</h3><p>Ticket compacto para impresoras térmicas de 58 u 80 mm, con ubicación en caja, código y datos.</p></div>
+      <div class="feature"><div class="ic"><%- icon('scan') %></div><h3>Escanea con la cámara</h3><p>Lee el QR con la cámara del celular o desde una foto de la galería.</p></div>
+      <div class="feature"><div class="ic"><%- icon('wa') %></div><h3>Avisos por WhatsApp</h3><p>Envía el código al remitente y avisa al destinatario con un toque, con el mensaje ya escrito.</p></div>
+      <div class="feature"><div class="ic"><%- icon('lock') %></div><h3>Tu punto, tus datos</h3><p>Cada paquetería tiene su número de punto. Nadie más ve tus paquetes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="como">
+  <div class="l-section">
+    <div class="head">
+      <h2>Así funciona</h2>
+      <p>Del registro a la entrega en cuatro pasos.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Regístrate</h3><p>Crea tu cuenta con tu Gmail y WhatsApp. Recibes tu número de punto.</p></div>
+      <div class="step"><h3>Registra el paquete</h3><p>Llena los datos y obtén código, QR y etiqueta para imprimir.</p></div>
+      <div class="step"><h3>Recíbelo en el punto</h3><p>Márcalo como recibido, asígnale una caja y avisa al destinatario.</p></div>
+      <div class="step"><h3>Entrega</h3><p>Escanea el QR cuando venga el destinatario y márcalo como entregado.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="l-section">
+  <div class="head">
+    <h2>Siempre sabes dónde está cada paquete</h2>
+  </div>
+  <div class="states">
+    <div class="state st-por_recibir"><span class="badge">Por recibir</span><p>Registrado, esperando a que llegue físicamente a tu punto.</p></div>
+    <div class="state st-en_punto"><span class="badge">En el punto</span><p>En tu estante, con su ubicación, listo para que lo recojan.</p></div>
+    <div class="state st-entregado"><span class="badge">Entregado</span><p>Ya está con el destinatario. Queda el historial con fecha y hora.</p></div>
+  </div>
+</section>
+
+<section class="l-section" style="padding-top:0">
+  <div class="cta-box">
+    <h2>Ordena tu punto desde hoy</h2>
+    <p>Crea tu cuenta en menos de un minuto.</p>
+    <a class="btn btn-dark btn-lg" href="/registro">Registrar mi paquetería</a>
+  </div>
+</section>
+
+<footer class="l-foot">
+  <%- include('partials/logo') %>
+  <span>© <%= new Date().getFullYear() %> <span data-brand-txt>PaqueteYa</span> · Hecho para paqueterías</span>
+</footer>
+</body>
+</html>
