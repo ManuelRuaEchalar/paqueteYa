@@ -52,12 +52,15 @@ const cajasDe = (puntoId) => db.all('SELECT * FROM cajas WHERE punto_id = $1 ORD
 const cajaValida = async (puntoId, nombre) =>
   (await db.one('SELECT nombre FROM cajas WHERE punto_id = $1 AND nombre = $2', [puntoId, normCaja(nombre)]))?.nombre || null;
 const esDuplicado = (e) => e.code === '23505';
+// Dirección que se usa mientras el punto no guarde una propia.
+const DIRECCION_DEFAULT = 'Calle Francisco Cerro #82, Zona El reloj.';
 
 app.use(ah(async (req, res, next) => {
   res.locals.user = null;
   if (req.session.puntoId) {
     res.locals.user = await db.one('SELECT * FROM puntos WHERE id = $1', [req.session.puntoId]);
     if (!res.locals.user) req.session = null;
+    else if (!res.locals.user.direccion) res.locals.user.direccion = DIRECCION_DEFAULT;
   }
   res.locals.path = req.path;
   res.locals.url = req.originalUrl;
